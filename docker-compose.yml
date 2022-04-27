@@ -1,6 +1,7 @@
 version: "3"
 services:
   webserver: 
+    hostname: roary
     build:
       context: webserver
     ports:
