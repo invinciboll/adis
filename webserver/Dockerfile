@@ -32,9 +32,15 @@ RUN apt-get install -y libapache2-mod-php8.1
 # Create symbolic link to enable mod_cgi
 RUN ln -s /etc/apache2/mods-available/cgi.load /etc/apache2/mods-enabled/
 
-# Copy cgi scripts into container and make it executable
-COPY hello.cgi /usr/lib/cgi-bin/
-RUN chmod +x /usr/lib/cgi-bin/hello.cgi
+# Copy templates and csv data into corresponding folders
+COPY /html/* /usr/lib/cgi-bin/html/
+COPY /data/* /usr/lib/cgi-bin/data/
+
+# Copy java code and cgi script into container, append java code to cgi and make it executable
+COPY Roary.java /usr/lib/cgi-bin/
+COPY roary.cgi /usr/lib/cgi-bin/
+RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/roary.cgi
+RUN chmod +x /usr/lib/cgi-bin/roary.cgi
 
 # Start the webserver on container startup
 # Explanation why to use FOREGROUND: https://stackoverflow.com/questions/44376852/how-to-start-apache2-automatically-in-a-ubuntu-docker-container
