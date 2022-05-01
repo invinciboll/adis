@@ -38,6 +38,7 @@ COPY /data/* /usr/lib/cgi-bin/data/
 
 # Copy java code and cgi script into container, append java code to cgi and make it executable
 COPY Roary.java /usr/lib/cgi-bin/
+COPY Roar.java /usr/lib/cgi-bin/
 COPY roary.cgi /usr/lib/cgi-bin/
 RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/roary.cgi
 RUN chmod +x /usr/lib/cgi-bin/roary.cgi
