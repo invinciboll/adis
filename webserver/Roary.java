@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +39,7 @@ public class Roary {
                 sb.append(line);
                 sb.append(System.lineSeparator());
                 String[] linePieces= line.split(",");
-                Roar roar = new Roar(linePieces[0], linePieces[1], linePieces[2]);
+                Roar roar = new Roar(linePieces[0], linePieces[1], Long.parseLong(linePieces[2]));
                 roars.add(roar);
                 line = br.readLine();
             }
@@ -54,7 +53,7 @@ public class Roary {
     static String generateHtmlFromRoars(List<Roar> roars){
         String htmlOutput = "";
         for(Roar roar : roars){
-            htmlOutput += ("<div class='container'><div class='card' style='width: 100%''><div class='card-body'><h5 class='card-title'>" + roar.getAuthor() + "</h5><p class='card-text'>" + roar.getMessage() +"</p><h6 class='card-subtitle mb-2 text-muted'>"+ roar.getDateTime() +"</h6></div></div></div>");
+            htmlOutput += ("<div class='container'><div class='card' style='width: 100%''><div class='card-body'><h5 class='card-title'>" + roar.getAuthor() + "</h5><p class='card-text'>" + roar.getMessage() +"</p><h6 class='card-subtitle mb-2 text-muted'>"+ Instant.ofEpochSecond(roar.getDateTime()) +"</h6></div></div></div>");
         }
         return htmlOutput;
     }
@@ -76,7 +75,7 @@ public class Roary {
         String message = "";
         String[] namePair = strings[0].split("=");
         if (namePair[0].equals("name")){
-            name = namePair[1];
+            name = java.net.URLDecoder.decode(namePair[1], StandardCharsets.UTF_8.name()).replace("\n", " ").replace("\r", " ");
         }
         String[] msgPair = strings[1].split("=");
         if (msgPair[0].equals("message")){
@@ -87,12 +86,11 @@ public class Roary {
             }
         }
         
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Roar roar = new Roar(name, message, (LocalDateTime.now().format(formatter).replace("\n", "").replace("\r", "")));
+        Roar roar = new Roar(name, message, (Instant.now().getEpochSecond()));
 
         BufferedWriter writer = new BufferedWriter(new FileWriter("data/roars.csv", true));
         writer.append('\n');
-        writer.append(roar.getAuthor() + "," + roar.getMessage() + "," + roar.getDateTime());
+        writer.append(roar.getAuthor() + "," + roar.getMessage() + "," + Long.toString(roar.getDateTime()) + "\n");
         writer.close();
 
         } catch (IOException ioe) {
@@ -109,7 +107,7 @@ public class Roary {
         }
 
         List<Roar> allRoars = loadRoars("data/roars.csv");
-        Collections.sort(allRoars, (Roar r1, Roar r2) -> r2.getDateTime().compareTo(r1.getDateTime()));
+        //Collections.sort(allRoars, (Roar r1, Roar r2) -> r2.getDateTime().compareTo(r1.getDateTime()));
         String roarsHtml = generateHtmlFromRoars(allRoars);
 
         System.out.print("Content-Type: text/html\r\n\r\n");
@@ -122,12 +120,12 @@ public class Roary {
 class Roar {
     private String author;
     private String message;
-    private String dateTime;
+    private long timestampEoch;
 
-    public Roar(String author, String message, String dateTime){
+    public Roar(String author, String message, long timestampEoch){
         this.author = author;
         this.message = message;
-        this.dateTime = dateTime;
+        this.timestampEoch = timestampEoch;
     }
 
     public String getAuthor(){
@@ -138,7 +136,7 @@ class Roar {
         return message;
     }
 
-    public String getDateTime(){
-        return dateTime;
+    public long getDateTime(){
+        return timestampEoch;
     }
 }

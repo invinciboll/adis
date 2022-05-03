@@ -23,8 +23,11 @@ ENV DEBCONF_NONINTERACTIVE_SEEN true
 RUN echo "tzdata tzdata/Areas select Europe" > /tmp/preseed.txt; \
     echo "tzdata tzdata/Zones/Europe select Berlin" >> /tmp/preseed.txt; \
     debconf-set-selections /tmp/preseed.txt && \
-    apt-get update && \
     apt-get install -y tzdata
+
+# Set timezone
+RUN ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
 
 # Install php module. No symbolic link needed to enable mod_php, since it gets automatically enabled after installation
 RUN apt-get install -y libapache2-mod-php8.1
@@ -38,10 +41,12 @@ COPY /data/* /usr/lib/cgi-bin/data/
 
 # Copy java code and cgi script into container, append java code to cgi and make it executable
 COPY Roary.java /usr/lib/cgi-bin/
-COPY Roar.java /usr/lib/cgi-bin/
-COPY roary.cgi /usr/lib/cgi-bin/
-RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/roary.cgi
-RUN chmod +x /usr/lib/cgi-bin/roary.cgi
+COPY task2.cgi /usr/lib/cgi-bin/
+
+COPY task3.php /usr/lib/cgi-bin/
+
+RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/task2.cgi
+RUN chmod +x /usr/lib/cgi-bin/task2.cgi
 
 # Start the webserver on container startup
 # Explanation why to use FOREGROUND: https://stackoverflow.com/questions/44376852/how-to-start-apache2-automatically-in-a-ubuntu-docker-container
