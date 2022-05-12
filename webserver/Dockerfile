@@ -39,12 +39,12 @@ RUN ln -s /etc/apache2/mods-available/cgi.load /etc/apache2/mods-enabled/
 COPY /html/* /usr/lib/cgi-bin/html/
 COPY /data/* /usr/lib/cgi-bin/data/
 
-# Copy java code and cgi script into container, append java code to cgi and make it executable
+# Copy java code, cgi script, php into container, append java code to cgi and make it executable
 COPY Roary.java /usr/lib/cgi-bin/
 COPY task2.cgi /usr/lib/cgi-bin/
-
 COPY task3.php /usr/lib/cgi-bin/
 
+# Append java code to cgi and make it executabl
 RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/task2.cgi
 RUN chmod +x /usr/lib/cgi-bin/task2.cgi
 

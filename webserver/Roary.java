@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Roary {
@@ -25,8 +26,9 @@ public class Roary {
             }
         String content = sb.toString();
         return content;
-        } catch (IOException exception){
-            return exception.toString();
+        } catch (IOException ioe){
+            System.out.println(ioe.getMessage());
+            return ioe.getMessage();
         }
     } 
     
@@ -43,15 +45,22 @@ public class Roary {
                 roars.add(roar);
                 line = br.readLine();
             }
+
+        Collections.sort(roars, new Comparator<Roar>() {
+            public int compare(Roar r1, Roar r2) {
+                return (r1.getDateTime() > r2.getDateTime()) ? -1 : ((r1.getDateTime() == r2.getDateTime()) ? 0 :1 );
+        }});
         return roars;
 
         } catch (IOException ioe){
-            return roars;
+            System.out.println(ioe.getMessage());
+            return null;
         }
     }
 
     static String generateHtmlFromRoars(List<Roar> roars){
         String htmlOutput = "";
+
         for(Roar roar : roars){
             htmlOutput += ("<div class='container'><div class='card' style='width: 100%''><div class='card-body'><h5 class='card-title'>" + roar.getAuthor() + "</h5><p class='card-text'>" + roar.getMessage() +"</p><h6 class='card-subtitle mb-2 text-muted'>"+ Instant.ofEpochSecond(roar.getDateTime()) +"</h6></div></div></div>");
         }
@@ -81,6 +90,10 @@ public class Roary {
         if (msgPair[0].equals("message")){
             try {
                 message = java.net.URLDecoder.decode(msgPair[1], StandardCharsets.UTF_8.name()).replace("\n", " ").replace("\r", " ");
+                if (message.length() > 128){
+                    System.out.println("<div class='alert alert-danger'>Message text should not be longer than 128 characters!</div>");
+                    return;
+                }
             } catch (UnsupportedEncodingException e) {
                 // not going to happen - value came from JDK's own StandardCharsets
             }
@@ -89,28 +102,26 @@ public class Roary {
         Roar roar = new Roar(name, message, (Instant.now().getEpochSecond()));
 
         BufferedWriter writer = new BufferedWriter(new FileWriter("data/roars.csv", true));
-        writer.append('\n');
         writer.append(roar.getAuthor() + "," + roar.getMessage() + "," + Long.toString(roar.getDateTime()) + "\n");
         writer.close();
 
         } catch (IOException ioe) {
-            System.out.println(ioe);
+            System.out.println(ioe.getMessage());
         }
     }
     public static void main(String[] args) {
         String htmlUpper = readTemplate("html/template-upper.html");
         String htmlLower = readTemplate("html/template-lower.html");
 
+        System.out.print("Content-Type: text/html\r\n\r\n");
+
         String method = System.getenv("REQUEST_METHOD");
         if (method.equals("POST")){
             addNewRoar();
         }
-
         List<Roar> allRoars = loadRoars("data/roars.csv");
-        //Collections.sort(allRoars, (Roar r1, Roar r2) -> r2.getDateTime().compareTo(r1.getDateTime()));
+       
         String roarsHtml = generateHtmlFromRoars(allRoars);
-
-        System.out.print("Content-Type: text/html\r\n\r\n");
         System.out.println(htmlUpper);
         System.out.println(roarsHtml);
         System.out.println(htmlLower);
