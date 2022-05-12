@@ -48,6 +48,13 @@ COPY task3.php /usr/lib/cgi-bin/
 RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/task2.cgi
 RUN chmod +x /usr/lib/cgi-bin/task2.cgi
 
+# Install SQLite to container
+RUN apt-get install -y sqlite3 libsqlite3-dev
+# Install sqlite extension to php
+RUN apt install php8.1-sqlite3
+# Copy db test script into container
+COPY test-db.php /usr/lib/cgi-bin/
+
 # Start the webserver on container startup
 # Explanation why to use FOREGROUND: https://stackoverflow.com/questions/44376852/how-to-start-apache2-automatically-in-a-ubuntu-docker-container
 CMD apachectl -D FOREGROUND
