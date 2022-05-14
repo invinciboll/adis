@@ -52,10 +52,9 @@ RUN chmod +x /usr/lib/cgi-bin/task2.cgi
 RUN apt-get install -y sqlite3 libsqlite3-dev
 # Install sqlite extension to php
 RUN apt install php8.1-sqlite3
-# Make dir for database
-RUN mkdir /usr/db
-RUN /usr/bin/sqlite3 /db/roary.db
-RUN chmod -R 777 /usr/db
+RUN mkdir /var/www/data
+RUN chown -R www-data:www-data /var/www/data
+RUN chmod -R 770 /var/www/data
 # Copy db test script into container
 COPY test-db.php /usr/lib/cgi-bin/
 

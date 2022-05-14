@@ -7,9 +7,6 @@ services:
     ports:
       - 80:80
       - 443:443
-#     volumes:
-#       - database:/usr/db
-
-# volumes:
-#   database:
+    volumes:
+      - ./webserver/data/roary.db:/var/www/data/roary.db:rw
 
