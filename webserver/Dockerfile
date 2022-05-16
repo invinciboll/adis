@@ -43,6 +43,8 @@ COPY /data/* /usr/lib/cgi-bin/data/
 COPY Roary.java /usr/lib/cgi-bin/
 COPY task2.cgi /usr/lib/cgi-bin/
 COPY task3.php /usr/lib/cgi-bin/
+COPY login.php /usr/lib/cgi-bin/
+COPY register.php /usr/lib/cgi-bin/
 
 # Append java code to cgi and make it executabl
 RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/task2.cgi

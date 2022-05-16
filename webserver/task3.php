@@ -1,4 +1,5 @@
 <?php
+session_start();
 date_default_timezone_set('Europe/Berlin');
 $filename = 'data/roars.csv';
 ?>
@@ -11,6 +12,13 @@ $filename = 'data/roars.csv';
     <div class="card">
         <div class="card-header">New Post</div>
           <div class="card-body">
+              <?php
+              $id = $_SESSION["id"];
+              $email = $_SESSION["email"];
+              $password = $_SESSION["password"];
+              echo "<div class='alert alert-info'>Logged in as User: $email</div>";
+              ?>
+
               <?php
               if (isset($_POST['submit'])) {
                   $name = $_POST['name'];
