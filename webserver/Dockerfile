@@ -43,6 +43,7 @@ COPY /data/* /usr/lib/cgi-bin/data/
 COPY Roary.java /usr/lib/cgi-bin/
 COPY task2.cgi /usr/lib/cgi-bin/
 COPY task3.php /usr/lib/cgi-bin/
+COPY getRoarys.php /usr/lib/cgi-bin/
 COPY login.php /usr/lib/cgi-bin/
 COPY register.php /usr/lib/cgi-bin/
 
