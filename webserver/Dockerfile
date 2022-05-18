@@ -35,21 +35,14 @@ RUN apt-get install -y libapache2-mod-php8.1
 # Create symbolic link to enable mod_cgi
 RUN ln -s /etc/apache2/mods-available/cgi.load /etc/apache2/mods-enabled/
 
-# Copy templates and csv data into corresponding folders
-COPY /html/* /usr/lib/cgi-bin/html/
+# Copy data into corresponding folders
 COPY /data/* /usr/lib/cgi-bin/data/
 
-# Copy java code, cgi script, php into container, append java code to cgi and make it executable
-COPY Roary.java /usr/lib/cgi-bin/
-COPY task2.cgi /usr/lib/cgi-bin/
+# Copy code
 COPY task3.php /usr/lib/cgi-bin/
 COPY getRoarys.php /usr/lib/cgi-bin/
 COPY login.php /usr/lib/cgi-bin/
 COPY register.php /usr/lib/cgi-bin/
-
-# Append java code to cgi and make it executabl
-RUN cat /usr/lib/cgi-bin/Roary.java >> /usr/lib/cgi-bin/task2.cgi
-RUN chmod +x /usr/lib/cgi-bin/task2.cgi
 
 # Install SQLite to container
 RUN apt-get install -y sqlite3 libsqlite3-dev
@@ -58,8 +51,9 @@ RUN apt install php8.1-sqlite3
 RUN mkdir /var/www/data
 RUN chown -R www-data:www-data /var/www/data
 RUN chmod -R 770 /var/www/data
-# Copy db test script into container
-COPY test-db.php /usr/lib/cgi-bin/
+
+RUN mkdir /var/www/html/exercise1
+RUN ln -s /usr/lib/cgi-bin/* /var/www/html/exercise1
 
 # Start the webserver on container startup
 # Explanation why to use FOREGROUND: https://stackoverflow.com/questions/44376852/how-to-start-apache2-automatically-in-a-ubuntu-docker-container
