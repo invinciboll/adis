@@ -1,11 +1,33 @@
-# How to run?
-Run ```docker-compose up --build``` in the ADIS folder.
+# Vorbereitung
+## Software
+1. Pyhton [3.10.4](https://www.python.org/downloads/)
+2. Als IDE [PyCharm Community Edition](https://www.jetbrains.com/de-de/pycharm/download/#section=windows)
+## Notwendige Einstellungen
 
-Task 1 documentation is inline in the Dockerfile.
+1. Pfad zum Ausführung von Pyhton anpassen
+```
+Unter Settings -> Tools -> Terminal -> Shell Path folgendes mit Anführungszeichen einstellen:
 
-Task 2 is available under: ```http://localhost/cgi-bin/task2.cgi```.
+"cmd.exe" /k ""PFAD\venv\Scripts\activate.bat""
 
-Task 3 is available under: ```http://localhost/cgi-bin/task3.php```.
+PFAD durch den Projekt-Pfad ersetzen (steht darüber in einem Feld)
+``` 
 
-# Known bugs
-The Timestamp by creating roars is UTC time, not UTC+2. We tried to fix it by setting the container timezone to UTC+2. The container shows the correct time when executing ```date``` in the terminal, but the cgi scripts still pull the wrong time.
+
+2. Django hinzufügen
+```
+Settings -> Project: Adis -> Pyhton Interpreter -> + -> Django -> Install Package
+``` 
+----
+# Wissen
+## Start der Webseite
+Navigiere in "\adis\webseite" und führe folgenden Befehl aus:\
+```python manage.py runserver``` 
+
+## Admin Account
+[Admin-Seite](http://127.0.0.1:8000/admin)\
+Username: admin\
+Password: admin\
+E-Mail: DennisRoth100@aol.com\
+## Hilfreiche Videos
+[Projekt starten und Seiten aufrufen - Webentwicklung | Python und Django | Teil 1](https://www.youtube.com/watch?v=reKC23pqimQ&list=PLuBK_vNnGp8Ba7GZV6_XUWLtWqWPFoUcu&ab_channel=NEW-Vadim)
