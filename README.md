@@ -19,9 +19,15 @@ PFAD durch den Projekt-Pfad ersetzen (steht darüber in einem Feld)
 Settings -> Project: Adis -> Pyhton Interpreter -> + -> Django -> Install Package
 ``` 
 ----
-# Start der Webseite
-Navigiere in den Pfad \adis\webseite und führe folgenden Befehl aus:\
+# Wissen
+## Start der Webseite
+Navigiere in "\adis\webseite" und führe folgenden Befehl aus:\
 ```python manage.py runserver``` 
 
-# Hilfreiche Videos
+## Admin Account
+[Admin-Seite](http://127.0.0.1:8000/admin)\
+Username: admin\
+Password: admin\
+E-Mail: DennisRoth100@aol.com\
+## Hilfreiche Videos
 [Projekt starten und Seiten aufrufen - Webentwicklung | Python und Django | Teil 1](https://www.youtube.com/watch?v=reKC23pqimQ&list=PLuBK_vNnGp8Ba7GZV6_XUWLtWqWPFoUcu&ab_channel=NEW-Vadim)
