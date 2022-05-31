@@ -1,61 +1,135 @@
-{% extends "roary/base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Roary</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!--
+    <?php
+        $user_id = $_SESSION["userId"];
+        $email = $_SESSION["email"];
+        if(!isset($email)) {
+            header('Location: http://localhost/cgi-bin/login.php');
+        }
+        echo "<meta name='email' content='$email'>";
+    ?>
+    -->
+    <script>
+        function fetchNewRoarys() {
+            let email = document.querySelector('meta[name=email]').content;
+            const Http = new XMLHttpRequest();
+            const url='getRoarys.php?email=' + email;
+            Http.open("GET", url);
+            Http.send();
 
-{% block title %}ROARY{% endblock title %}
+            Http.onreadystatechange = function(e) {
+                let data = JSON.parse(Http.responseText);
+                var content = "";
+                for (var x = 0; x < data.length; x++) {
+                    var time = new Date(data[x].time * 1000);
+                    var timeString = time.getDate() + ". " + (time.getMonth() + 1) + ". " + time.getFullYear() + ", " + time.getHours() + ":" + time.getMinutes();
+                    content += "<div class='card' style='20px 0;'><div class='card-body'><h5 class='card-title'>" + data[x].title + "</h5><p>" + data[x].message + "</p><div class='card-footer'><small class='text-muted'>" + timeString + "</small></div></div></div>";
+                }
+                document.getElementById('cards').innerHTML = content;
+            }
+        }
+        setInterval(fetchNewRoarys, 1 * 1000);
+        fetchNewRoarys();
+    </script>
 
-{% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">ROARY</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-            <a class="nav-link" href="#">My Favourites<span class="sr-only">(current)</span></a>
-            </li>
-        </ul>
-        <a class="mr-sm-2 text-light">{{ User.username }}</a>
-        <a type="submit" class="btn btn-secondary my-2 my-sm-0" value="Logout" method="POST" href="{% url 'roary:logout' %}">Logout</a>
-    </div>
-</nav>
-{% endblock navbar %}
 
-{% block content %}
-<div class="card">
-    <div class="card-header">New Roar</div>
-        <div class="card-body">
-            <form method="POST" class="post-form">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-secondary">Post roar</button>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="container">
-</br>
-{% for roar in existing_roars %}
+</head>
+
+<!--
+<?php
+// Create (connect to) SQLite database in file
+$db = new PDO('sqlite:/var/www/data/roary.db');
+
+// Set errormode to exceptions
+$db->setAttribute(PDO::ATTR_ERRMODE,
+            PDO::ERRMODE_EXCEPTION);
+
+// Creates user table if neccessary
+$db->exec("CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY,
+    title TEXT,
+    message TEXT,
+    time INTEGER)");
+
+?>
+-->
+<body style="padding: 5rem 20rem;">
     <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{{ roar.author }}</h5>
-            <p>{{ roar.text }}</p>
-            <div class="card-footer">
-            {% if roar.liked %}
-            <a class="btn" href="{% url 'roary:remove_favourite' roar.id %}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-suit-heart-fill" viewBox="0 0 16 16">
-                <path d="M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92 0 2.755 1.79 1 4 1z"/>
-                </svg></a>
-            {% else %}
-            <a class="btn" href="{% url 'roary:add_favourite' roar.id %}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-suit-heart" viewBox="0 0 16 16">
-                <path d="m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595L8 6.236zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.55 7.55 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z"/>
-            </svg></a>
-            {% endif %}
+        <div class="card-header">New Post</div>
+          <div class="card-body">
 
+              <!--
+                <?php
+                    echo "<div class='alert alert-info'>Logged in as User: $email</div>";
+                ?>
+              <?php
+              if (isset($_POST['logout'])) {
+                    session_destroy();
+                    header('Location: http://localhost/cgi-bin/login.php');
+              }
+              if (isset($_POST['submit'])) {
+                  $msg = $_POST['message'];
+                  if(strlen($msg) > 128) {
+                      echo "<div class='alert alert-danger'>Message text should not be longer than 128 characters!</div>";
+                  } else {
+                    $time = time();
+                    $line = array($name, $msg, $time);
 
-            <a class="">{{ roar.amount_of_likes }}</a>
-            <a class="float-right small">{{ roar.timestamp }}</a>
-            </div>
-        </div>
-        </div>
-{% endfor %}
-</div>
-{% endblock content %}
+                    // Prepare INSERT statement to SQLite3 file db
+                    $insert = "INSERT INTO messages (title, message, time) VALUES (:title, :message, :time)";
+                    $stmt = $db->prepare($insert);
+
+                    $data = [
+                        'title' => $email,
+                        'message' => $msg,
+                        'time' => $time,
+                    ];
+
+                    // Execute statement
+                    $stmt->execute($data);
+                  }
+              }
+              ?>
+              -->
+            <form method="post" action="">
+                <label for="exampleInputEmail1">Name</label>
+                <input type="text" name="name" value="??" disabled="disabled" class="form-control" id="exampleInputEmail1" placeholder="Enter your name">
+                <br />
+                <label for="exampleInputEmail1">Message</label>
+                <textarea name="message" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <br />
+                <input type="submit" name="submit" class="btn btn-primary"/>
+                <input type="submit" name="logout" value="Logout" class="btn btn-secondary"/>
+            </form>
+          </div>
+    </div>
+<br />
+<br />
+
+<section id='cards'>
+<!--
+<?php
+$stm = $db->prepare("SELECT title, message, time FROM messages WHERE title = :email ORDER BY time DESC;");
+$stm->execute([':email' => $email]);
+while ($row = $stm->fetch()) {
+    ?>
+    <div class="card" style=' 20px 0;'>
+       <div class="card-body">
+          <h5 class="card-title"><?php echo htmlspecialchars($row['title']) ?></h5>
+          <p><?php echo htmlspecialchars($row['message']) ?></p>
+          <div class="card-footer">
+             <small class="text-muted"><?php echo gmdate("d. m. Y, H:i", $row['time']); ?></small>
+          </div>
+       </div>
+    </div>
+    <?php
+}
+?>
+-->
+</section>
+</body>
+</html>
