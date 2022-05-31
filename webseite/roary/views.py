@@ -93,3 +93,28 @@ def remove_favourite(request, roar_id):
         except(Exception):
             print('Favourite removal failed')
     return redirect('/')
+
+def remove_favourite_from_favourites_page(request, roar_id):
+    if request.user.is_authenticated:
+        try:
+            roar = models.Roar.objects.get(pk=roar_id)
+            favourite = models.Favourite.objects.filter(roar_id=roar, user_id=request.user)
+            favourite.delete()
+        except(Exception):
+            print('Favourite removal failed')
+    return redirect('favourites/')
+
+def my_favourites(request):
+    if request.user.is_authenticated:
+        # try:
+            favourites_of_user = list(models.Favourite.objects.filter(user=request.user).values_list('roar_id', flat=True))
+            # favourite_roars = []
+            # for fav_id in favourites_of_user:
+            #     favourite_roars.append(models.Favourite.objects.get(roar_id=fav_id, user_id=request.user))
+            favourite_roars = models.Roar.objects.filter(id__in=[roar_id for roar_id in favourites_of_user])
+            return render(request, 'roary/favourites.html', {'User': request.user, 'favourite_roars':favourite_roars})
+        # except(Exception):
+        #     print('Favourites could not be loaded')
+        #     return redirect('/')
+    else:
+        return redirect('/')
