@@ -1,6 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.forms import model_to_dict
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
+import json
 
 from .forms import RoarForm
 from . import models
@@ -28,8 +31,7 @@ def index(request):
                 roar.liked = True
             else:
                 roar.liked = False
-        
-        
+
         return render(request, 'roary/index.html', {'User': request.user, 'form': form, 'existing_roars': existing_roars, 'favourites_of_user':favourites_of_user})
     
     else:
@@ -118,3 +120,29 @@ def my_favourites(request):
         #     return redirect('/')
     else:
         return redirect('/')
+
+
+def get_roarys(request):
+    if request.is_ajax:
+        likes_list = list(models.Favourite.objects.values_list('roar_id', flat=True))
+        favourites_of_user = list(models.Favourite.objects.filter(user=request.user).values_list('roar_id', flat=True))
+        existing_roars = models.Roar.objects.all().order_by('-timestamp')
+        for roar in existing_roars:
+            roar.amount_of_likes = likes_list.count(roar.id)
+            if roar.id in favourites_of_user:
+                roar.liked = True
+            else:
+                roar.liked = False
+
+        json_data = []
+        for roar in existing_roars:
+            json_data.append({
+                "id": roar.id,
+                "author": roar.author.username,
+                "text": roar.text,
+                "timestamp": roar.timestamp.strftime('%B %d, %Y %I:%M %p'),
+                "liked": roar.liked,
+                "amount_of_likes": roar.amount_of_likes
+            })
+        dump = json.dumps(json_data)
+        return HttpResponse(dump, content_type='application/json')

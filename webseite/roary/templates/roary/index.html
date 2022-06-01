@@ -2,6 +2,7 @@
 {% load crispy_forms_filters %}
 
 {% block title %}ROARY{% endblock title %}
+
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="{% url 'roary:index' %}">ROARY</a>
@@ -35,8 +36,8 @@
         </div>
     </div>
 </div>
-<div class="container">
-</br>
+<div class="container" id="cards" style="padding-top:20px;">
+
 {% for roar in existing_roars %}
     <div class="card">
         <div class="card-body">
@@ -60,3 +61,5 @@
 {% endfor %}
 </div>
 {% endblock content %}
+
+

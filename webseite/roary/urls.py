@@ -12,4 +12,6 @@ urlpatterns = [
     path('add_favourite/<int:roar_id>', views.add_favourite, name='add_favourite'),
     path('remove_favourite/<int:roar_id>', views.remove_favourite, name='remove_favourite'),
     path('my_favourites/', views.my_favourites, name='my_favourites'),
+    path('get_roarys/', views.get_roarys, name='get_roarys'),
+
 ]
