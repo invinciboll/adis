@@ -68,20 +68,22 @@
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">Username</label>
                                         <div class="col-md-6">
-                                            <input type="text" name="username" value="" required autofocus
-                                                class="form-control">
+                                            <input type="text" name="username" value="" id="register-username" required
+                                                autofocus class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
                                         <div class="col-md-6">
-                                            <input type="email" name="email" value="" required class="form-control">
+                                            <input type="email" name="email" value="" id="register-email" required
+                                                class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">Password</label>
                                         <div class="col-md-6">
-                                            <input type="password" name="password" required class="form-control">
+                                            <input type="password" name="password" id="register-password" required
+                                                class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row mb-0">
@@ -135,6 +137,10 @@
             switch (location.hash)
             {
                 case '#/login':
+                    if (localStorage.getItem("email") != undefined)
+                    {
+                        document.getElementById("login-email").value = localStorage.getItem("email");
+                    }
                     document.getElementById('roary-login').classList.remove('d-none');
                     break;
 
@@ -215,7 +221,10 @@
                         const userName = this.response;
                         document.querySelector('#roary-login input[name="email"]').classList.remove('is-invalid');
                         document.querySelector('#roary-login input[name="password"]').value = '';
+
                         localStorage.setItem('username', userName);
+                        localStorage.setItem('email', email);
+
                         location.hash = '/';
                         showSnackBar("Login erfolgreich");
                     } else
@@ -228,6 +237,58 @@
 
             };
             xhttp.send(JSON.stringify({ "email": email, "password": password }));
+        }
+
+        async function register(e)
+        {
+            e.preventDefault();
+
+            const username = document.getElementById("register-username").value;
+            const email = document.getElementById("register-email").value;
+            const password = document.getElementById("register-password").value;
+
+            if (password.length < 6)
+            {
+                showSnackBar("Passwort zu kurz!");
+                return;
+            }
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/register");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function ()
+            {
+                if (this.readyState === XMLHttpRequest.DONE)
+                {
+                    if (this.status == 200)
+                    {
+                        // Pass information directly to login (faster)
+                        localStorage.setItem('email', email);
+                        location.hash = '/login';
+
+                        // Clear registration information
+                        document.getElementById("register-username").value = "";
+                        document.getElementById("register-email").value = "";
+                        document.getElementById("register-password").value = "";
+                    } else
+                    {
+                        document.querySelector('#roary-login input[name="email"]').classList.add('is-invalid');
+
+                        const response = document.createElement('div');
+                        response.className = 'alert';
+                        response.innerText = "E-Mail Adresse wird bereits verwendet";
+                        response.classList.add('alert-danger');
+
+                        // remove previous alert
+                        document.querySelectorAll('#roary-register div.alert').forEach(e => e.parentNode.removeChild(e));
+                        // display new alert
+                        document.querySelector('#roary-register form').insertAdjacentElement('afterBegin', response);
+                    }
+                }
+
+            };
+            xhttp.send(JSON.stringify({ "name": username, "email": email, "password": password }));
         }
 
         async function showSnackBar(message)
@@ -245,25 +306,6 @@
                 var x = document.getElementById("myToast");
                 x.classList.remove("show")
             }, 3000);
-        }
-
-        async function register(e)
-        {
-            e.preventDefault();
-
-            // todo: register by sending an ajax request to the server
-            const error = Math.random() > 0.5;
-            const message = error ? 'Username is already taken' : 'Successfully registered';
-
-            const response = document.createElement('div');
-            response.className = 'alert';
-            response.innerText = message;
-            response.classList.add(error ? 'alert-danger' : 'alert-success');
-
-            // remove previous alert
-            document.querySelectorAll('#roary-register div.alert').forEach(e => e.parentNode.removeChild(e));
-            // display new alert
-            document.querySelector('#roary-register form').insertAdjacentElement('afterBegin', response);
         }
 
         async function logout()

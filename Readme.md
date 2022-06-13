@@ -2,6 +2,9 @@
 Im Terminal im Projektverzeichnis folgenden Kommand ausführen: \
 `npm backend.js`
 
+# Start des Frontends
+Kein Start notwendig. Man kann einfach per rechtsklick die HTML-Seite im Browser öffnen.
+
 # Datenbank zurücksetzen
 In database Ordner die Datenbank (db.sqlite) löschen.
 Im database Ordner folgende Befehle ausführen: \
@@ -12,6 +15,15 @@ Im database Ordner folgende Befehle ausführen: \
 # Notwendige Plugins
 - Sqlite Viewer (Vs Code)
 - Sqlite (Vs Code)
+
+# Wie kommt man an die Session-Informationen?
+Über:\
+```
+const userName = localStorage.getItem('username');
+```
+```
+const email = localStorage.getItem('email');
+```
 
 # Hilfreiche Tools
 Zum testen von Post Requests: https://addons.mozilla.org/de/firefox/addon/rested/\

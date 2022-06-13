@@ -98,6 +98,7 @@ app.post('/register', async (req, res) =>
       console.log(err.message)
       return res.sendStatus(400);
     }
+
     console.log(`A row has been inserted with rowid ${this.lastID}`);
     res.sendStatus(200);
   });
