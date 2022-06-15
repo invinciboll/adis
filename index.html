@@ -343,10 +343,9 @@
 
                         document.querySelector('#roar-list').innerHTML = "";
                         for (roar of data) {
-                            const roary_id = roar['id'];
-                            const user_id = roar['user_id'];
                             const dateTimeStr = new Date(roar.timestamp).toLocaleString();
-
+                            const isLiked = roar['roar_id'] != null;
+                            console.log(isLiked);
                             document.querySelector('#roar-list').insertAdjacentHTML('afterBegin', `
                             <div class="card mb-1">
                                 <div class="card-body">
@@ -357,7 +356,7 @@
                                     </h5>
                             
                                     <p class="card-text">${roar.text}</p>
-                                    <button data-roary-id='${roar.id}' class="btn-like-roary btn badge badge-pill ${roar.text ? 'badge-danger' : 'badge-secondary'}"><b>&#10084;&emsp;${roar.text}</b></button>
+                                    <button class="btn-like-roary btn badge badge-pill ${isLiked ? 'badge-danger' : 'badge-secondary'}"><b>&#10084;&emsp;${roar.amount}</b></button>
                                 </div>
                             </div>
                         `);

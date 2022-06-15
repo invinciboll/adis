@@ -99,10 +99,9 @@ app.post('/get-roary', async (req, res) => {
 
   console.log("E-Mail = " + email);
 
-  var query = "SELECT * FROM user JOIN roar ON user.id = roar.user_id WHERE upper(email) = upper('" + email + "')";
+  //var query = "SELECT * FROM user JOIN roar ON user.id = roar.user_id WHERE upper(email) = upper('" + email + "')";
 
-  //var query = "SELECT * FROM user JOIN favourite ON user.id = favourite.user_id JOIN roar ON roar.id = favourite.roar_id GROUP BY roar.id"; //WHERE upper(email) = upper('" + email + "')";
-
+  var query = "SELECT *, COUNT(*) AS amount FROM roar LEFT JOIN user ON user.id = roar.user_id LEFT JOIN favourite ON roar.id = favourite.roar_id GROUP BY roar.timestamp";
 
   db.all(query, function (err, rows) {
     if (err) {
