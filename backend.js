@@ -9,8 +9,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 // Important because of Cross-Origin-Access
-app.use(function (req, res, next)
-{
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
@@ -21,21 +20,17 @@ const saltRounds = 10;
 const sqlite3 = require('sqlite3');
 
 // Create database connection
-let db = new sqlite3.Database('./database/db.sqlite', (err) =>
-{
-  if (err)
-  {
+let db = new sqlite3.Database('./database/db.sqlite', (err) => {
+  if (err) {
     console.log("Error Occurred - " + err.message);
   }
-  else
-  {
+  else {
     console.log("DataBase Connected");
   }
 });
 
 // login api
-app.post('/login', async (req, res) =>
-{
+app.post('/login', async (req, res) => {
   console.log("Try to login");
 
   var email = req.body.email;
@@ -46,16 +41,12 @@ app.post('/login', async (req, res) =>
   var query = "SELECT password, name FROM user WHERE upper(email) = upper('" + email + "')";
 
   var username;
-  db.all(query, function (err, rows)
-  {
-    if (err)
-    {
+  db.all(query, function (err, rows) {
+    if (err) {
       console.log(err.message);
       return res.sendStatus(400);
-    } else
-    {
-      if (rows.length == 0)
-      {
+    } else {
+      if (rows.length == 0) {
         res.sendStatus(404);
         return;
       }
@@ -64,11 +55,9 @@ app.post('/login', async (req, res) =>
       username = rows[0].name;
       const loginSuccessful = bcrypt.compareSync(password, hashedPassword);
 
-      if (loginSuccessful)
-      {
+      if (loginSuccessful) {
         return res.status(200).send(username);
-      } else
-      {
+      } else {
         return res.sendStatus(401);
       }
     }
@@ -76,8 +65,7 @@ app.post('/login', async (req, res) =>
 })
 
 // registration api
-app.post('/register', async (req, res) =>
-{
+app.post('/register', async (req, res) => {
   console.log("Try to register");
   var name = req.body.name;
   var email = req.body.email;
@@ -91,10 +79,8 @@ app.post('/register', async (req, res) =>
 
   var sqlCommand = `INSERT INTO user(name, email, password) VALUES('${name}', '${email}', '${hash}')`;
 
-  db.run(sqlCommand, [], function (err)
-  {
-    if (err)
-    {
+  db.run(sqlCommand, [], function (err) {
+    if (err) {
       console.log(err.message)
       return res.sendStatus(400);
     }
@@ -104,7 +90,125 @@ app.post('/register', async (req, res) =>
   });
 })
 
-app.listen(port, () =>
-{
+
+// get all roary
+app.post('/get-roary', async (req, res) => {
+  console.log("Try to get roary");
+
+  var email = req.body.email;
+
+  console.log("E-Mail = " + email);
+
+  var query = "SELECT * FROM user JOIN roar ON user.id = roar.user_id WHERE upper(email) = upper('" + email + "')";
+
+  //var query = "SELECT * FROM user JOIN favourite ON user.id = favourite.user_id JOIN roar ON roar.id = favourite.roar_id GROUP BY roar.id"; //WHERE upper(email) = upper('" + email + "')";
+
+
+  db.all(query, function (err, rows) {
+    if (err) {
+      console.log(err.message);
+      return res.sendStatus(400);
+    } else {
+      if (rows.length == 0) {
+        res.sendStatus(404);
+        return;
+      }
+
+      return res.status(200).send(rows);
+
+    }
+  });
+})
+
+
+
+// is liked roary api
+app.post('/is-liked-roary', async (req, res) => {
+  console.log("Try to get roary");
+
+  var user_id = req.body.user_id;
+  var roary_id = req.body.roary_id;
+
+  console.log("E-Mail = " + user_id);
+
+  var query = "SELECT DISTINCT id FROM favourite WHERE user_id = " + user_id + " AND roar_id = " + roary_id + ";";
+
+  db.all(query, function (err, rows) {
+    if (err) {
+      console.log(err.message);
+      return res.sendStatus(400);
+    } else {
+      console.log(rows.length == 0);
+
+      return res.status(200).send([{ "is_liked": rows.length }]);
+
+
+
+    }
+  });
+})
+
+
+// post roary api
+app.post('/post-roary', async (req, res) => {
+  console.log("Try to post roary");
+  var email = req.body.email;
+  var text = req.body.text;
+
+  console.log("Email = " + email + ", Text = " + text);
+
+  var query = "SELECT id FROM user WHERE email = '" + email + "';";
+
+  db.all(query, function (err, rows) {
+    if (err) {
+      console.log(err.message);
+    }
+    var user_id = rows[0].id;
+    var date = new Date().getTime();
+    var sqlCommand = `INSERT INTO roar(user_id, text, timestamp) VALUES('${user_id}', '${text}', '${date}')`;
+    db.run(sqlCommand, [], function (err) {
+      if (err) {
+        console.log(err.message)
+        return res.sendStatus(400);
+      }
+
+      console.log(`A row has been inserted with rowid ${this.lastID}`);
+      res.sendStatus(200);
+    });
+  });
+
+})
+
+// like roary api
+app.post('/like-roary', async (req, res) => {
+  console.log("Try to post roary");
+  var email = req.body.email;
+  var roary_id = req.body.roary_id;
+
+  console.log("Email = " + email + ", roary_id = " + roary_id);
+
+  var query = "SELECT id FROM user WHERE email = '" + email + "';";
+
+  db.all(query, function (err, rows) {
+    if (err) {
+      console.log(err.message);
+    }
+    var user_id = rows[0].id;
+    var date = new Date().getTime();
+    var sqlCommand = `INSERT INTO favourite (user_id, roar_id) VALUES('${user_id}', '${roary_id}')`;
+    db.run(sqlCommand, [], function (err) {
+      if (err) {
+        console.log(err.message)
+        return res.sendStatus(400);
+      }
+
+      console.log(`A row has been inserted with rowid ${this.lastID}`);
+      res.sendStatus(200);
+    });
+  });
+
+})
+
+app.listen(port, () => {
   console.log(`Baxkend listening on port ${port}`)
 })

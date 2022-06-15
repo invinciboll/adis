@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Roary v0.4</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 </head>
 
 <body>
@@ -16,16 +15,16 @@
             <a class="navbar-brand" href="/">Roary v0.4</a>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item" data-route="login">
-                    <a class="nav-link" href="/#/login">Login</a>
+                    <a class="nav-link" href="./index.html#/login">Login</a>
                 </li>
                 <li class="nav-item" data-route="register">
-                    <a class="nav-link" href="/#/register">Register</a>
+                    <a class="nav-link" href="./index.html#/register">Register</a>
                 </li>
                 <li class="nav-item" data-route="liked">
-                    <a class="nav-link" href="/#/liked">Liked Roars</a>
+                    <a class="nav-link" href="./index.html#/liked">Liked Roars</a>
                 </li>
                 <li class="nav-item" data-route="logout">
-                    <a class="nav-link" href="/#/logout">Logout <small>(name)</small></a>
+                    <a class="nav-link" href="./index.html#/logout">Logout <small>(name)</small></a>
                 </li>
             </ul>
         </div>
@@ -42,15 +41,13 @@
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
                                         <div class="col-md-6">
-                                            <input type="email" name="email" value="" id="login-email" required
-                                                autofocus class="form-control">
+                                            <input type="email" name="email" value="" id="login-email" required autofocus class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">Password</label>
                                         <div class="col-md-6">
-                                            <input type="password" name="password" id="login-password" required
-                                                class="form-control">
+                                            <input type="password" name="password" id="login-password" required class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row mb-0">
@@ -68,22 +65,19 @@
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">Username</label>
                                         <div class="col-md-6">
-                                            <input type="text" name="username" value="" id="register-username" required
-                                                autofocus class="form-control">
+                                            <input type="text" name="username" value="" id="register-username" required autofocus class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
                                         <div class="col-md-6">
-                                            <input type="email" name="email" value="" id="register-email" required
-                                                class="form-control">
+                                            <input type="email" name="email" value="" id="register-email" required class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-md-4 col-form-label text-md-right">Password</label>
                                         <div class="col-md-6">
-                                            <input type="password" name="password" id="register-password" required
-                                                class="form-control">
+                                            <input type="password" name="password" id="register-password" required class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row mb-0">
@@ -102,8 +96,7 @@
                             <div class="card-body">
                                 <form>
                                     <div class="form-group">
-                                        <textarea class="form-control" name="message" rows="3" required
-                                            autofocus></textarea>
+                                        <textarea class="form-control" name="message" rows="3" required autofocus></textarea>
                                         <div class="invalid-feedback" role="alert"></div>
                                     </div>
                                     <div class="float-right">
@@ -126,19 +119,16 @@
         </div>
     </div>
     <script type="text/javascript">
-        function routeChanged()
-        {
+        function routeChanged() {
             document.getElementById('roar-form').classList.add('d-none');
             document.getElementById('roar-list').classList.add('d-none');
             document.getElementById('roary-login').classList.add('d-none');
             document.getElementById('roary-register').classList.add('d-none');
             document.getElementById('login-required').classList.add('d-none');
 
-            switch (location.hash)
-            {
+            switch (location.hash) {
                 case '#/login':
-                    if (localStorage.getItem("email") != undefined)
-                    {
+                    if (localStorage.getItem("email") != undefined) {
                         document.getElementById("login-email").value = localStorage.getItem("email");
                     }
                     document.getElementById('roary-login').classList.remove('d-none');
@@ -153,11 +143,9 @@
                     break;
 
                 case '#/liked':
-                    if (localStorage.getItem('username') !== null)
-                    {
+                    if (localStorage.getItem('username') !== null) {
                         document.getElementById('roar-list').classList.remove('d-none');
-                    } else
-                    {
+                    } else {
                         document.getElementById('login-required').classList.remove('d-none');
                     }
 
@@ -167,12 +155,10 @@
                     break;
 
                 case '#/':
-                    if (localStorage.getItem('username') !== null)
-                    {
+                    if (localStorage.getItem('username') !== null) {
                         document.getElementById('roar-form').classList.remove('d-none');
                         document.getElementById('roar-list').classList.remove('d-none');
-                    } else
-                    {
+                    } else {
                         document.getElementById('login-required').classList.remove('d-none');
                     }
 
@@ -185,15 +171,13 @@
                     location.hash = '/';
             }
 
-            if (localStorage.getItem('username') !== null)
-            {
+            if (localStorage.getItem('username') !== null) {
                 document.querySelector('nav li[data-route="login"]').classList.add('d-none');
                 document.querySelector('nav li[data-route="register"]').classList.add('d-none');
                 document.querySelector('nav li[data-route="logout"]').classList.remove('d-none');
                 document.querySelector('nav li[data-route="liked"]').classList.remove('d-none');
                 document.querySelector('nav li[data-route="logout"] small').innerText = `(${localStorage.getItem('username')})`;
-            } else
-            {
+            } else {
                 document.querySelector('nav li[data-route="login"]').classList.remove('d-none');
                 document.querySelector('nav li[data-route="register"]').classList.remove('d-none');
                 document.querySelector('nav li[data-route="logout"]').classList.add('d-none');
@@ -201,8 +185,7 @@
             }
         }
 
-        async function login(e)
-        {
+        async function login(e) {
             e.preventDefault();
 
             const email = document.getElementById("login-email").value;
@@ -212,12 +195,9 @@
             xhttp.open("POST", "http://localhost:3000/login");
             xhttp.setRequestHeader("Content-type", "application/json");
 
-            xhttp.onreadystatechange = function ()
-            {
-                if (this.readyState === XMLHttpRequest.DONE)
-                {
-                    if (this.status == 200)
-                    {
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
                         const userName = this.response;
                         document.querySelector('#roary-login input[name="email"]').classList.remove('is-invalid');
                         document.querySelector('#roary-login input[name="password"]').value = '';
@@ -227,8 +207,7 @@
 
                         location.hash = '/';
                         showSnackBar("Login erfolgreich");
-                    } else
-                    {
+                    } else {
                         document.querySelector('#roary-login input[name="email"]').classList.add('is-invalid');
                         document.querySelector('#roary-login input[name="password"]').value = '';
                         showSnackBar("Login nicht erfolgreich");
@@ -239,16 +218,14 @@
             xhttp.send(JSON.stringify({ "email": email, "password": password }));
         }
 
-        async function register(e)
-        {
+        async function register(e) {
             e.preventDefault();
 
             const username = document.getElementById("register-username").value;
             const email = document.getElementById("register-email").value;
             const password = document.getElementById("register-password").value;
 
-            if (password.length < 6)
-            {
+            if (password.length < 6) {
                 showSnackBar("Passwort zu kurz!");
                 return;
             }
@@ -257,12 +234,9 @@
             xhttp.open("POST", "http://localhost:3000/register");
             xhttp.setRequestHeader("Content-type", "application/json");
 
-            xhttp.onreadystatechange = function ()
-            {
-                if (this.readyState === XMLHttpRequest.DONE)
-                {
-                    if (this.status == 200)
-                    {
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
                         // Pass information directly to login (faster)
                         localStorage.setItem('email', email);
                         location.hash = '/login';
@@ -271,8 +245,7 @@
                         document.getElementById("register-username").value = "";
                         document.getElementById("register-email").value = "";
                         document.getElementById("register-password").value = "";
-                    } else
-                    {
+                    } else {
                         document.querySelector('#roary-login input[name="email"]').classList.add('is-invalid');
 
                         const response = document.createElement('div');
@@ -291,8 +264,7 @@
             xhttp.send(JSON.stringify({ "name": username, "email": email, "password": password }));
         }
 
-        async function showSnackBar(message)
-        {
+        async function showSnackBar(message) {
             var toastElement = document.getElementById("myToast");
             var toastMessageElement = document.getElementById("toastMessage");
             toastMessageElement.innerText = message;
@@ -301,23 +273,20 @@
             toastElement.classList.add("show");
 
             // After 3 seconds, remove the show class from DIV
-            setTimeout(function ()
-            {
+            setTimeout(function () {
                 var x = document.getElementById("myToast");
                 x.classList.remove("show")
             }, 3000);
         }
 
-        async function logout()
-        {
+        async function logout() {
             // todo: logout by sending an ajax request to the server
 
             localStorage.clear();
             location.hash = '/';
         }
 
-        async function postRoar(e)
-        {
+        async function postRoar(e) {
             e.preventDefault();
 
             // todo: submit roar by sending an ajax request to the server
@@ -325,62 +294,138 @@
             const error = message.length > 128;
             const response = error ? 'Message is too long' : '';
 
-            if (!error)
-            {
+            if (!error) {
                 document.querySelector('#roar-form textarea[name="message"]').classList.remove('is-invalid');
                 document.querySelector('#roar-form textarea[name="message"]').value = '';
-            } else
-            {
+            } else {
                 document.querySelector('#roar-form .invalid-feedback').textContent = response;
                 document.querySelector('#roar-form textarea[name="message"]').classList.add('is-invalid');
             }
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/post-roary");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        showSnackBar("Roary posted!");
+                    }
+                }
+            }
+
+            const email = localStorage.getItem('email');
+            xhttp.send(JSON.stringify({ "email": email, "text": message }));
+
         }
 
-        async function fetchRoars()
-        {
-            if (!localStorage.getItem('username'))
-            {
+        async function fetchRoars() {
+            if (!localStorage.getItem('username')) {
                 return;
             }
 
             // todo: replace by appropriate ajax requests to fetch new roars
 
-            const roar = {
-                username: Math.random().toString(36).substring(2, 15),
-                date: new Date(),
-                message: Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2),
-                likes: Math.round(Math.random() * 128),
-                liked: Math.random() > 0.5
-            };
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/get-roary");
+            xhttp.setRequestHeader("Content-type", "application/json");
 
-            if (location.hash === '#/liked')
-            {
-                // show only liked roars
-                roar.liked = true;
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        var data = JSON.parse(xhttp.response);
+
+                        console.log(data);
+                        if (location.hash === '#/liked') {
+                            // show only liked roars
+                            roar.liked = true;
+                        }
+
+                        document.querySelector('#roar-list').innerHTML = "";
+                        for (roar of data) {
+                            const roary_id = roar['id'];
+                            const user_id = roar['user_id'];
+                            const dateTimeStr = new Date(roar.timestamp).toLocaleString();
+
+                            document.querySelector('#roar-list').insertAdjacentHTML('afterBegin', `
+                            <div class="card mb-1">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        ${roar.name}
+                            
+                                        <small class="text-muted float-right">${dateTimeStr}</small>
+                                    </h5>
+                            
+                                    <p class="card-text">${roar.text}</p>
+                                    <button data-roary-id='${roar.id}' class="btn-like-roary btn badge badge-pill ${roar.text ? 'badge-danger' : 'badge-secondary'}"><b>&#10084;&emsp;${roar.text}</b></button>
+                                </div>
+                            </div>
+                        `);
+                            document.querySelector('.btn-like-roary').addEventListener('click', likeRoary);
+
+
+
+
+                        }
+                    }
+                }
+            }
+            const email = localStorage.getItem('email');
+            xhttp.send(JSON.stringify({ "email": email }));
+
+
+        }
+
+        async function likeRoary(event) {
+            if (!localStorage.getItem('username')) {
+                return;
             }
 
-            document.querySelector('#roar-list').insertAdjacentHTML('afterBegin', `
-                    <div class="card mb-1">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                ${roar.username}
-                    
-                                <small class="text-muted float-right">${roar.date.toLocaleString('en-GB')}</small>
-                            </h5>
-                    
-                            <p class="card-text">${roar.message}</p>
-                            <button class="btn badge badge-pill ${roar.liked ? 'badge-danger' : 'badge-secondary'}"><b>&#10084;&emsp;${roar.likes}</b></button>
-                        </div>
-                    </div>
-                `);
+            // todo: replace by appropriate ajax requests to fetch new roars
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/like-roary");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        showSnackBar("Roary liked!");
+                        if (location.hash === '#/liked') {
+                            // show only liked roars
+                            roar.liked = true;
+                        }
+
+                    }
+                }
+            }
+            const email = localStorage.getItem('email');
+            console.log(event.target.attributes[0].value);
+            const roary_id = event.target.attributes[0].value;
+            xhttp.send(JSON.stringify({ "email": email, "roary_id": roary_id }));
+
+
         }
 
         document.querySelector('#roary-login form').addEventListener('submit', login);
         document.querySelector('#roary-register form').addEventListener('submit', register);
         document.querySelector('#roar-form form').addEventListener('submit', postRoar);
+
         window.addEventListener('hashchange', routeChanged, false);
-        setInterval(fetchRoars, 10000);
+        //setInterval(fetchRoars, 10000);
         routeChanged();
+
+        /*window.addEventListener("load", () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(function (registration) {
+                        console.log("Service Worker Registered", registration);
+                    })
+                    .catch(function (err) {
+                        console.log("Service Worker Failed to Register", err);
+                    })
+            }
+        });*/
     </script>
 </body>
 
