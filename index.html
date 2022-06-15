@@ -310,6 +310,7 @@
                 if (this.readyState === XMLHttpRequest.DONE) {
                     if (this.status == 200) {
                         showSnackBar("Roary posted!");
+                        fetchRoars();
                     }
                 }
             }
@@ -345,7 +346,7 @@
                         for (roar of data) {
                             const dateTimeStr = new Date(roar.timestamp).toLocaleString();
                             const isLiked = roar['roar_id'] != null;
-                            console.log(isLiked);
+                            console.log(roar);
                             document.querySelector('#roar-list').insertAdjacentHTML('afterBegin', `
                             <div class="card mb-1">
                                 <div class="card-body">
@@ -356,7 +357,7 @@
                                     </h5>
                             
                                     <p class="card-text">${roar.text}</p>
-                                    <button class="btn-like-roary btn badge badge-pill ${isLiked ? 'badge-danger' : 'badge-secondary'}"><b>&#10084;&emsp;${roar.amount}</b></button>
+                                    <button data-roary-id='${roar.roary_id}' class="btn-like-roary btn badge badge-pill ${isLiked ? 'badge-danger' : 'badge-secondary'}"><b style='pointer-events: none;'>&#10084;&emsp;${roar.amount}</b></button>
                                 </div>
                             </div>
                         `);
@@ -390,6 +391,7 @@
                 if (this.readyState === XMLHttpRequest.DONE) {
                     if (this.status == 200) {
                         showSnackBar("Roary liked!");
+                        fetchRoars();
                         if (location.hash === '#/liked') {
                             // show only liked roars
                             roar.liked = true;

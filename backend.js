@@ -99,9 +99,9 @@ app.post('/get-roary', async (req, res) => {
 
   console.log("E-Mail = " + email);
 
-  //var query = "SELECT * FROM user JOIN roar ON user.id = roar.user_id WHERE upper(email) = upper('" + email + "')";
+  //var query = "SELECT * FROM roar";
 
-  var query = "SELECT *, COUNT(*) AS amount FROM roar LEFT JOIN user ON user.id = roar.user_id LEFT JOIN favourite ON roar.id = favourite.roar_id GROUP BY roar.timestamp";
+  var query = "SELECT roar.id AS roary_id, COUNT(*) AS amount, * FROM roar JOIN user ON user.id = roar.user_id LEFT JOIN favourite ON roar.id = favourite.roar_id GROUP BY timestamp";
 
   db.all(query, function (err, rows) {
     if (err) {
@@ -119,33 +119,6 @@ app.post('/get-roary', async (req, res) => {
   });
 })
 
-
-
-// is liked roary api
-app.post('/is-liked-roary', async (req, res) => {
-  console.log("Try to get roary");
-
-  var user_id = req.body.user_id;
-  var roary_id = req.body.roary_id;
-
-  console.log("E-Mail = " + user_id);
-
-  var query = "SELECT DISTINCT id FROM favourite WHERE user_id = " + user_id + " AND roar_id = " + roary_id + ";";
-
-  db.all(query, function (err, rows) {
-    if (err) {
-      console.log(err.message);
-      return res.sendStatus(400);
-    } else {
-      console.log(rows.length == 0);
-
-      return res.status(200).send([{ "is_liked": rows.length }]);
-
-
-
-    }
-  });
-})
 
 
 // post roary api
@@ -193,6 +166,7 @@ app.post('/like-roary', async (req, res) => {
       console.log(err.message);
     }
     var user_id = rows[0].id;
+    console.log("User-id = " + user_id);
     var date = new Date().getTime();
     var sqlCommand = `INSERT INTO favourite (user_id, roar_id) VALUES('${user_id}', '${roary_id}')`;
     db.run(sqlCommand, [], function (err) {
