@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sw-cache';
+const CACHE_NAME = 'static-v1';
 const toCache = [
     '/',
     '/index.html',
@@ -17,21 +17,6 @@ self.addEventListener('install', function (event)
     console.log('service worker registered');
 })
 
-self.addEventListener('fetch', function (event)
-{
-    event.respondWith(
-        fetch(event.request)
-            .catch(() =>
-            {
-                return caches.open(CACHE_NAME)
-                    .then((cache) =>
-                    {
-                        return cache.match(event.request)
-                    })
-            })
-    );
-    console.log('requests got interpreted by service worker');
-})
 
 self.addEventListener('activate', function (event)
 {
@@ -51,4 +36,20 @@ self.addEventListener('activate', function (event)
             })
             .then(() => self.clients.claim())
     );
+})
+
+self.addEventListener('fetch', function (event)
+{
+    event.respondWith(
+        fetch(event.request)
+            .catch(() =>
+            {
+                return caches.open(CACHE_NAME)
+                    .then((cache) =>
+                    {
+                        return cache.match(event.request)
+                    })
+            })
+    );
+    console.log('requests got interpreted by service worker');
 })

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Roary v0.4</title>
+    <title>Roary v0.5</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -13,7 +13,7 @@
 <body>
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="/">Roary v0.4</a>
+            <a class="navbar-brand" href="#/">Roary v0.4</a>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item" data-route="login">
                     <a class="nav-link" href="./index.html#/login">Login</a>
@@ -125,7 +125,19 @@
             </div>
         </div>
     </div>
-    <script src="/pwa.js"></script>
+    <script>
+        if ('serviceWorker' in navigator)
+        {
+            navigator.serviceWorker.register('service-worker.js')
+                .then((reg) =>
+                {
+                    console.log('Service worker registered -->', reg);
+                }, (err) =>
+                {
+                    console.error('Service worker not registered -->', err);
+                });
+        }
+    </script>
     <script type="text/javascript">
         function routeChanged()
         {
@@ -175,6 +187,7 @@
                     } else
                     {
                         document.getElementById('login-required').classList.remove('d-none');
+                        document.getElementById('roar-list').classList.remove('d-none');
                     }
 
                     // reset roar list and fetch roars
@@ -206,7 +219,7 @@
         {
             e.preventDefault();
 
-            const email = document.getElementById("login-email").value;
+            const email = document.getElementById("login-email").value.toLowerCase();
             const password = document.getElementById("login-password").value;
 
             var xhttp = new XMLHttpRequest();
@@ -245,7 +258,7 @@
             e.preventDefault();
 
             const username = document.getElementById("register-username").value;
-            const email = document.getElementById("register-email").value;
+            const email = document.getElementById("register-email").value.toLowerCase();
             const password = document.getElementById("register-password").value;
 
             if (password.length < 6)
@@ -264,14 +277,20 @@
                 {
                     if (this.status == 200)
                     {
-                        // Pass information directly to login (faster)
-                        localStorage.setItem('email', email);
-                        location.hash = '/login';
-
                         // Clear registration information
                         document.getElementById("register-username").value = "";
                         document.getElementById("register-email").value = "";
                         document.getElementById("register-password").value = "";
+
+                        const response = document.createElement('div');
+                        response.className = 'alert';
+                        response.innerText = "Registrierung erfolgreich";
+                        response.classList.add('alert-success');
+
+                        // remove previous alert
+                        document.querySelectorAll('#roary-register div.alert').forEach(e => e.parentNode.removeChild(e));
+                        // display new alert
+                        document.querySelector('#roary-register form').insertAdjacentElement('afterBegin', response);
                     } else
                     {
                         document.querySelector('#roary-login input[name="email"]').classList.add('is-invalid');
@@ -357,28 +376,12 @@
 
         }
 
+
         async function fetchRoars()
         {
-            if (!localStorage.getItem('username'))
-            {
-                return;
-            }
-
-            // todo: replace by appropriate ajax requests to fetch new roars
-
             var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "http://localhost:3000/get-roary");
+            xhttp.open("POST", "http://localhost:3000/get-roaries");
             xhttp.setRequestHeader("Content-type", "application/json");
-
-            var onlyLiked;
-
-            if (location.hash === '#/liked')
-            {
-                onlyLiked = true;
-            } else
-            {
-                onlyLiked = false;
-            }
 
             xhttp.onreadystatechange = function ()
             {
@@ -386,13 +389,44 @@
                 {
                     if (this.status == 200)
                     {
-                        var data = JSON.parse(xhttp.response);
+                        var roaries = JSON.parse(xhttp.response);
 
                         document.querySelector('#roar-list').innerHTML = "";
-                        for (roar of data)
+
+                        for (roar of roaries)
                         {
-                            const dateTimeStr = new Date(roar.timestamp).toLocaleString();
-                            const isLiked = roar['roar_id'] != null;
+                            processRoary(roar);
+                        }
+                    }
+                }
+            }
+
+            xhttp.send(JSON.stringify({}));
+        }
+
+        function processRoary(roar)
+        {
+            const dateTimeStr = new Date(roar.timestamp).toLocaleString();
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/get-likes-for-roary");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function ()
+            {
+                if (this.readyState === XMLHttpRequest.DONE)
+                {
+                    if (this.status == 200)
+                    {
+                        var result = JSON.parse(xhttp.response);
+                        let numberOfLikes = result.count;
+                        let likedByEmail = result.liked;
+
+                        if (location.hash === '#/liked' && likedByEmail === false)
+                        {
+                            return;
+                        } else
+                        {
                             document.querySelector('#roar-list').insertAdjacentHTML('afterBegin', `
                             <div class="card mb-1">
                                 <div class="card-body">
@@ -400,30 +434,28 @@
                                         ${roar.name}   
                                         <small class="text-muted float-right">${dateTimeStr}</small>
                                     </h5>
-                            
+
                                     <p class="card-text">${roar.text}</p>
-                                    <button data-roary-id='${roar.roary_id}' class="btn-like-roary btn badge badge-pill ${isLiked ? 'badge-danger' : 'badge-secondary'}"><b style='pointer-events: none;'>&#10084;&emsp;${roar.amount}</b></button>
+                                    <button data-roary-id='${roar.roar_id}' class="btn-like-roary btn badge badge-pil}"><b style='pointer-events: none;'>${likedByEmail ? '&#10084' : '&#129293'};  ${numberOfLikes}</b></button>
                                 </div>
                             </div>
-                        `);
+                            `);
                             document.querySelector('.btn-like-roary').addEventListener('click', likeRoary);
                         }
+
+                    } else
+                    {
+                        return;
                     }
                 }
             }
             const email = localStorage.getItem('email');
-            xhttp.send(JSON.stringify({ "email": email, "onlyLiked": onlyLiked }));
+            xhttp.send(JSON.stringify({ "email": email, "roaryId": roar.roar_id }));
         }
+
 
         async function likeRoary(event)
         {
-            if (!localStorage.getItem('username'))
-            {
-                return;
-            }
-
-            // todo: replace by appropriate ajax requests to fetch new roars
-
             var xhttp = new XMLHttpRequest();
             xhttp.open("POST", "http://localhost:3000/like-roary");
             xhttp.setRequestHeader("Content-type", "application/json");

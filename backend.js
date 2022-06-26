@@ -38,7 +38,7 @@ app.post('/login', async (req, res) =>
 {
   console.log("Try to login");
 
-  var email = req.body.email;
+  let email = req.body.email.toLowerCase();
   var password = req.body.password + "";
 
   console.log("E-Mail = " + email + ", Password = " + password);
@@ -80,7 +80,7 @@ app.post('/register', async (req, res) =>
 {
   console.log("Try to register");
   var name = req.body.name;
-  var email = req.body.email;
+  let email = req.body.email.toLowerCase();
 
   var password = req.body.password + "";
 
@@ -105,26 +105,65 @@ app.post('/register', async (req, res) =>
 })
 
 
-// get all roary
-app.post('/get-roary', async (req, res) =>
+
+// get likes for specific roary
+app.post('/get-likes-for-roary', async (req, res) =>
 {
-  console.log("Try to get roary");
+  console.log("Try to fetch likes for roary");
 
-  var email = req.body.email;
-  var onlyLiked = req.body.onlyLiked;
+  // email which should be checked, if it has liked this specific roar
+  let email = req.body.email;
 
-  console.log("Only Liked = " + onlyLiked);
-  console.log("E-Mail = " + email);
+  // the roary id
+  let roaryId = req.body.roaryId;
 
-  var query;
-  if (onlyLiked)
+  console.log("input roaryId: " + roaryId);
+  console.log("input email: " + email);
+
+  let likedNumberQuery = `SELECT COUNT(*) as numberOfLikes FROM roar JOIN user ON user.id = roar.user_id JOIN favourite ON roar.id = favourite.roar_id WHERE roar.id = ${roaryId};`
+  let isLikedByEmailQuery = `SELECT * FROM favourite JOIN user ON user.id = favourite.user_id JOIN roar ON roar.id = favourite.roar_id WHERE roar.id = ${roaryId} AND user.email = '${email}'`
+
+  db.all(likedNumberQuery, function (err, rows)
   {
-    query = `SELECT roar.id AS roary_id, COUNT(*) AS amount, * FROM roar JOIN user ON user.id = roar.user_id JOIN favourite ON roar.id = favourite.roar_id WHERE user.id=favourite.user_id AND roar.id=favourite.roar_id AND user.email='${email}' GROUP BY timestamp`;
-  } else
-  {
-    query = "SELECT roar.id AS roary_id, COUNT(*) AS amount, * FROM roar JOIN user ON user.id = roar.user_id JOIN favourite ON roar.id = favourite.roar_id GROUP BY timestamp";
-  }
+    if (err)
+    {
+      console.log(err.message);
+      return res.sendStatus(400);
+    } else
+    {
+      let numberOfLikes = rows[0].numberOfLikes;
+      let likedByEmail;
 
+      db.all(isLikedByEmailQuery, function (err, rows2)
+      {
+        if (err)
+        {
+          console.log(err.message);
+          return res.sendStatus(400);
+        } else
+        {
+          likedByEmail = rows2.length != 0;
+
+          console.log("numberOfLikes: " + numberOfLikes);
+          console.log("likedByEmail: " + likedByEmail);
+
+          return res.status(200).send({
+            count: numberOfLikes,
+            liked: likedByEmail,
+          });
+        }
+      });
+    }
+  });
+})
+
+
+// get all roary
+app.post('/get-roaries', async (req, res) =>
+{
+  console.log("Try to fetch roaries");
+
+  let query = `SELECT roar.id AS roar_id, roar.text, roar.timestamp, user.name, user.email  FROM roar JOIN user ON user.id = roar.user_id GROUP BY roar.timestamp`;
 
   db.all(query, function (err, rows)
   {
@@ -165,6 +204,7 @@ app.post('/post-roary', async (req, res) =>
     {
       console.log(err.message);
     }
+
     var user_id = rows[0].id;
     var date = new Date().getTime();
     var sqlCommand = `INSERT INTO roar(user_id, text, timestamp) VALUES('${user_id}', '${text}', '${date}')`;
