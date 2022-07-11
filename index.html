@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Roary v0.5</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#/">Roary v0.4</a>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item" data-route="login">
+                    <a class="nav-link" href="./index.html#/login">Login</a>
+                </li>
+                <li class="nav-item" data-route="register">
+                    <a class="nav-link" href="./index.html#/register">Register</a>
+                </li>
+                <li class="nav-item" data-route="liked">
+                    <a class="nav-link" href="./index.html#/liked">Liked Roars</a>
+                </li>
+                <li class="nav-item" data-route="logout">
+                    <a class="nav-link" href="./index.html#/logout">Logout <small>(name)</small></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <main>
+                        <div class="card d-none" id="roary-login">
+                            <div class="card-header">Login</div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
+                                        <div class="col-md-6">
+                                            <input type="email" name="email" value="" id="login-email" required autofocus class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 col-form-label text-md-right">Password</label>
+                                        <div class="col-md-6">
+                                            <input type="password" name="password" id="login-password" required class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mb-0">
+                                        <div class="col-md-8 offset-md-4">
+                                            <button type="submit" class="btn btn-primary"> Login </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card d-none" id="roary-register">
+                            <div class="card-header">Register</div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 col-form-label text-md-right">Username</label>
+                                        <div class="col-md-6">
+                                            <input type="text" name="username" value="" id="register-username" required autofocus class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
+                                        <div class="col-md-6">
+                                            <input type="email" name="email" value="" id="register-email" required class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 col-form-label text-md-right">Password</label>
+                                        <div class="col-md-6">
+                                            <input type="password" name="password" id="register-password" required class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mb-0">
+                                        <div class="col-md-6 offset-md-4">
+                                            <button type="submit" class="btn btn-primary"> Register </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card d-none" id="login-required">
+                            <div class="card-body"> Log in to post new Roars... </div>
+                        </div>
+                        <div class="card d-none" id="roar-form">
+                            <div class="card-header">New Roar</div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="message" rows="3" required autofocus></textarea>
+                                        <div class="invalid-feedback" role="alert"></div>
+                                    </div>
+                                    <div class="float-right">
+                                        <button type="submit" name="submit" class="btn btn-info">Post Roar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-none" id="roar-list">
+                        </div>
+                    </main>
+                </div>
+            </div>
+            <div class="toast fade mt-5 ml-auto mr-auto" data-bs-autohide="true" data-bs-delay="1000" id="myToast">
+                <div class="toast-header">
+                    <strong class="me-auto"><i class="bi-gift-fill"></i> Info</strong>
+                </div>
+                <div class="toast-body" id="toastMessage"> Default message. </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        setInterval(function () {
+            document.getElementById('roar-list').textContent = '';
+            fetchRoars();
+        }, 5000);
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then((reg) => {
+                    console.log('Service worker registered -->', reg);
+                }, (err) => {
+                    console.error('Service worker not registered -->', err);
+                });
+        }
+    </script>
+    <script type="text/javascript">
+        function routeChanged() {
+            document.getElementById('roar-form').classList.add('d-none');
+            document.getElementById('roar-list').classList.add('d-none');
+            document.getElementById('roary-login').classList.add('d-none');
+            document.getElementById('roary-register').classList.add('d-none');
+            document.getElementById('login-required').classList.add('d-none');
+
+            switch (location.hash) {
+                case '#/login':
+                    if (localStorage.getItem("email") != undefined) {
+                        document.getElementById("login-email").value = localStorage.getItem("email");
+                    }
+                    document.getElementById('roary-login').classList.remove('d-none');
+                    break;
+
+                case '#/logout':
+                    logout();
+                    break;
+
+                case '#/register':
+                    document.getElementById('roary-register').classList.remove('d-none');
+                    break;
+
+                case '#/liked':
+                    if (localStorage.getItem('username') !== null) {
+                        document.getElementById('roar-list').classList.remove('d-none');
+                    } else {
+                        document.getElementById('login-required').classList.remove('d-none');
+                    }
+
+                    // reset roar list and fetch roars
+                    document.getElementById('roar-list').textContent = '';
+                    fetchRoars();
+                    break;
+
+                case '#/':
+                    if (localStorage.getItem('username') !== null) {
+                        document.getElementById('roar-form').classList.remove('d-none');
+                        document.getElementById('roar-list').classList.remove('d-none');
+                    } else {
+                        document.getElementById('login-required').classList.remove('d-none');
+                        document.getElementById('roar-list').classList.remove('d-none');
+                    }
+
+                    // reset roar list and fetch roars
+                    document.getElementById('roar-list').textContent = '';
+                    fetchRoars();
+                    break;
+
+                default:
+                    location.hash = '/';
+            }
+
+            if (localStorage.getItem('username') !== null) {
+                document.querySelector('nav li[data-route="login"]').classList.add('d-none');
+                document.querySelector('nav li[data-route="register"]').classList.add('d-none');
+                document.querySelector('nav li[data-route="logout"]').classList.remove('d-none');
+                document.querySelector('nav li[data-route="liked"]').classList.remove('d-none');
+                document.querySelector('nav li[data-route="logout"] small').innerText = `(${localStorage.getItem('username')})`;
+            } else {
+                document.querySelector('nav li[data-route="login"]').classList.remove('d-none');
+                document.querySelector('nav li[data-route="register"]').classList.remove('d-none');
+                document.querySelector('nav li[data-route="logout"]').classList.add('d-none');
+                document.querySelector('nav li[data-route="liked"]').classList.add('d-none');
+            }
+        }
+
+        async function login(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("login-email").value.toLowerCase();
+            const password = document.getElementById("login-password").value;
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/login");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        const userName = this.response;
+                        document.querySelector('#roary-login input[name="email"]').classList.remove('is-invalid');
+                        document.querySelector('#roary-login input[name="password"]').value = '';
+
+                        localStorage.setItem('username', userName);
+                        localStorage.setItem('email', email);
+
+                        location.hash = '/';
+                        showSnackBar("Login erfolgreich");
+                    } else {
+                        document.querySelector('#roary-login input[name="email"]').classList.add('is-invalid');
+                        document.querySelector('#roary-login input[name="password"]').value = '';
+                        showSnackBar("Login nicht erfolgreich");
+                    }
+                }
+
+            };
+            xhttp.send(JSON.stringify({ "email": email, "password": password }));
+        }
+
+        async function register(e) {
+            e.preventDefault();
+
+            const username = document.getElementById("register-username").value;
+            const email = document.getElementById("register-email").value.toLowerCase();
+            const password = document.getElementById("register-password").value;
+
+            if (password.length < 6) {
+                showSnackBar("Passwort zu kurz!");
+                return;
+            }
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/register");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        // Clear registration information
+                        document.getElementById("register-username").value = "";
+                        document.getElementById("register-email").value = "";
+                        document.getElementById("register-password").value = "";
+
+                        const response = document.createElement('div');
+                        response.className = 'alert';
+                        response.innerText = "Registrierung erfolgreich";
+                        response.classList.add('alert-success');
+
+                        // remove previous alert
+                        document.querySelectorAll('#roary-register div.alert').forEach(e => e.parentNode.removeChild(e));
+                        // display new alert
+                        document.querySelector('#roary-register form').insertAdjacentElement('afterBegin', response);
+                    } else {
+                        document.querySelector('#roary-login input[name="email"]').classList.add('is-invalid');
+
+                        const response = document.createElement('div');
+                        response.className = 'alert';
+                        response.innerText = "E-Mail Adresse wird bereits verwendet";
+                        response.classList.add('alert-danger');
+
+                        // remove previous alert
+                        document.querySelectorAll('#roary-register div.alert').forEach(e => e.parentNode.removeChild(e));
+                        // display new alert
+                        document.querySelector('#roary-register form').insertAdjacentElement('afterBegin', response);
+                    }
+                }
+
+            };
+            xhttp.send(JSON.stringify({ "name": username, "email": email, "password": password }));
+        }
+
+        async function showSnackBar(message) {
+            var toastElement = document.getElementById("myToast");
+            var toastMessageElement = document.getElementById("toastMessage");
+            toastMessageElement.innerText = message;
+
+            // Add the "show" class to DIV
+            toastElement.classList.add("show");
+
+            // After 3 seconds, remove the show class from DIV
+            setTimeout(function () {
+                var x = document.getElementById("myToast");
+                x.classList.remove("show")
+            }, 3000);
+        }
+
+        async function logout() {
+            // todo: logout by sending an ajax request to the server
+
+            localStorage.clear();
+            location.hash = '/';
+        }
+
+        async function postRoar(e) {
+            e.preventDefault();
+
+            // todo: submit roar by sending an ajax request to the server
+            const message = document.querySelector('#roar-form textarea').value;
+            const error = message.length > 128;
+            const response = error ? 'Message is too long' : '';
+
+            if (!error) {
+                document.querySelector('#roar-form textarea[name="message"]').classList.remove('is-invalid');
+                document.querySelector('#roar-form textarea[name="message"]').value = '';
+            } else {
+                document.querySelector('#roar-form .invalid-feedback').textContent = response;
+                document.querySelector('#roar-form textarea[name="message"]').classList.add('is-invalid');
+            }
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/roary");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        showSnackBar("Roary posted!");
+                        fetchRoars();
+                    }
+                }
+            }
+
+            const email = localStorage.getItem('email');
+            xhttp.send(JSON.stringify({ "email": email, "text": message }));
+
+        }
+
+
+        async function fetchRoars() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "http://localhost:3000/roary");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        var roaries = JSON.parse(xhttp.response);
+
+                        document.querySelector('#roar-list').innerHTML = "";
+
+                        for (roar of roaries) {
+                            processRoary(roar);
+                        }
+                    }
+                }
+            }
+
+            xhttp.send(JSON.stringify({}));
+        }
+
+        function processRoary(roar) {
+            const dateTimeStr = new Date(roar.timestamp).toLocaleString();
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "http://localhost:3000/roary/ " + +roar.roar_id + "/likes");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        var result = JSON.parse(xhttp.response);
+                        let numberOfLikes = result.count;
+                        let likedByEmail = result.liked;
+
+                        if (location.hash === '#/liked' && likedByEmail === false) {
+                            return;
+                        } else {
+                            document.querySelector('#roar-list').insertAdjacentHTML('afterBegin', `
+                            <div class="card mb-1">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        ${roar.name}   
+                                        <small class="text-muted float-right">${dateTimeStr}</small>
+                                    </h5>
+
+                                    <p class="card-text">${roar.text}</p>
+                                    <button data-roary-id='${roar.roar_id}' class="btn-like-roary btn badge badge-pil}"><b style='pointer-events: none;'>${likedByEmail ? '&#10084' : '&#129293'};  ${numberOfLikes}</b></button>
+                                </div>
+                            </div>
+                            `);
+                            document.querySelector('.btn-like-roary').addEventListener('click', likeRoary);
+                        }
+
+                    } else {
+                        return;
+                    }
+                }
+            }
+            const email = localStorage.getItem('email');
+            xhttp.send(JSON.stringify({ "email": email, "roaryId": roar.roar_id }));
+        }
+
+
+        async function likeRoary(event) {
+            const roary_id = event.target.attributes[0].value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://localhost:3000/roary/" + roary_id + "/like");
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    if (this.status == 200) {
+                        showSnackBar("Roary liked!");
+                        fetchRoars();
+                        if (location.hash === '#/liked') {
+                            // show only liked roars
+                            roar.liked = true;
+                        }
+
+                    }
+                }
+            }
+            const email = localStorage.getItem('email');
+            xhttp.send(JSON.stringify({ "email": email, "roary_id": roary_id }));
+        }
+
+        document.querySelector('#roary-login form').addEventListener('submit', login);
+        document.querySelector('#roary-register form').addEventListener('submit', register);
+        document.querySelector('#roar-form form').addEventListener('submit', postRoar);
+
+        window.addEventListener('hashchange', routeChanged, false);
+        //setInterval(fetchRoars, 10000);
+        routeChanged();
+    </script>
+</body>
+
+</html>

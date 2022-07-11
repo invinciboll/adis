@@ -1,0 +1,27 @@
+/* 
+ *  Create & init site content
+ */
+
+-- ITEMS --
+CREATE TABLE IF NOT EXISTS user (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS roar (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  text TEXT DEFAULT "",
+  timestamp CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS favourite (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  roar_id INTEGER,
+  FOREIGN KEY(roar_id) REFERENCES roar(id),
+  FOREIGN KEY(user_id) REFERENCES user(id)
+);
