@@ -128,7 +128,6 @@
     <script>
         setInterval(function ()
         {
-            document.getElementById('roar-list').textContent = '';
             fetchRoars();
         }, 5000);
     </script>
@@ -384,6 +383,8 @@
         }
 
 
+        var localRoaries = [];
+
         async function fetchRoars()
         {
             var xhttp = new XMLHttpRequest();
@@ -397,6 +398,13 @@
                     if (this.status == 200)
                     {
                         var roaries = JSON.parse(xhttp.response);
+
+                        if (JSON.stringify(localRoaries) == JSON.stringify(roaries))
+                        {
+                            console.log("updated Roarys");
+                            return;
+                        }
+                        localRoaries = roaries;
 
                         document.querySelector('#roar-list').innerHTML = "";
 
